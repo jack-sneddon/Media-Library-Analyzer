@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Media Library Analysis</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Media Library Analysis</h1>
+            <div class="summary">
+                <p><strong>Total Files:</strong> {{.TotalFiles}}</p>
+                <p><strong>Total Years:</strong> {{len .Years}}</p>
+                <p><strong>Last Updated:</strong> {{.LastUpdated.Format "2006-01-02 15:04:05"}}</p>
+            </div>
+            <div class="status-indicator">
+                <div class="indicator">
+                    <div class="dot normal"></div>
+                    <span>Normal (10+ files)</span>
+                </div>
+                <div class="indicator">
+                    <div class="dot light"></div>
+                    <span>Light (1-9 files)</span>
+                </div>
+                <div class="indicator">
+                    <div class="dot missing"></div>
+                    <span>Missing (0 files)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="decade-filter">Decade:</label>
+                <select id="decade-filter" class="filter-input">
+                    <option value="all">All Decades</option>
+                    <option value="2020">2020s</option>
+                    <option value="2010">2010s</option>
+                    <option value="2000">2000s</option>
+                    <option value="1990">1990s</option>
+                    <option value="1980">1980s</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter" class="filter-input">
+                    <option value="all">All Status</option>
+                    <option value="missing">Missing</option>
+                    <option value="light">Light</option>
+                    <option value="normal">Normal</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="month-filter">Month:</label>
+                <select id="month-filter" class="filter-input">
+                    <option value="all">All Months</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="min-files">Min Files:</label>
+                <input type="number" id="min-files" class="filter-input" min="0" placeholder="Min files">
+            </div>
+            <div class="filter-group">
+                <label>Year Range:</label>
+                <input type="number" id="year-start" class="filter-input" placeholder="Start Year" min="1980">
+                <span>to</span>
+                <input type="number" id="year-end" class="filter-input" placeholder="End Year">
+            </div>
+            <div class="filter-buttons">
+                <button onclick="resetFilters()" class="filter-button">Reset Filters</button>
+            </div>
+            <div id="active-filters"></div>
+        </div>
+
+        {{range .SortedYears}}
+        <div class="year" data-year="{{.Year}}">
+            <h2>
+                {{.Year}}
+                <span class="year-total">{{.Data.TotalFiles}} files</span>
+            </h2>
+            <div class="month-grid">
+                {{range $monthName, $monthData := .Data.Months}}
+                <div class="month-card {{$monthData.Status}}" data-status="{{$monthData.Status}}">
+                    <div>
+                        <h3 class="month-name">{{$monthName}}</h3>
+                        <p class="file-count">Files: {{$monthData.FileCount}}</p>
+                    </div>
+                    {{if eq $monthData.Status "missing"}}
+                        <p class="status-text">❌ No files found</p>
+                    {{else if eq $monthData.Status "light"}}
+                        <p class="status-text">⚠️ Low file count</p>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+    </div>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>
