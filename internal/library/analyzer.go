@@ -18,14 +18,14 @@ type MonthData struct {
 }
 
 type YearData struct {
-	Year   int                    `json:"year"`
-	Months map[string]*MonthData  `json:"months"`
+	Year   int                   `json:"year"`
+	Months map[string]*MonthData `json:"months"`
 }
 
 type AnalysisResult struct {
 	Years       map[int]*YearData `json:"years"`
-	TotalFiles  int              `json:"totalFiles"`
-	LastUpdated time.Time        `json:"lastUpdated"`
+	TotalFiles  int               `json:"totalFiles"`
+	LastUpdated time.Time         `json:"lastUpdated"`
 }
 
 type Analyzer struct {
@@ -46,14 +46,13 @@ func (y *YearData) TotalFiles() int {
 	return total
 }
 
-
 func (a *Analyzer) extractYear(dirName string) (int, error) {
 	// Handle different year patterns
 	patterns := []string{
-		`^(\d{4})-.*`,           // e.g., "1987- Jack"
-		`^(\d{4})$`,             // e.g., "2023"
-		`^(\d{4}) - .*`,         // e.g., "1994 - Lynsey"
-		`^(\d{4})-\d{4}.*`,      // e.g., "1989-1990 - Jack"
+		`^(\d{4})-.*`,      // e.g., "1987- Jack"
+		`^(\d{4})$`,        // e.g., "2023"
+		`^(\d{4}) - .*`,    // e.g., "1994 - Lynsey"
+		`^(\d{4})-\d{4}.*`, // e.g., "1989-1990 - Jack"
 	}
 
 	for _, pattern := range patterns {
@@ -85,8 +84,8 @@ func (a *Analyzer) Analyze() (*AnalysisResult, error) {
 		}
 
 		// Skip special directories
-		if entry.Name() == "possible_duplicates" || 
-		   !strings.Contains(entry.Name(), "-") && len(entry.Name()) != 4 {
+		if entry.Name() == "possible_duplicates" ||
+			!strings.Contains(entry.Name(), "-") && len(entry.Name()) != 4 {
 			continue
 		}
 

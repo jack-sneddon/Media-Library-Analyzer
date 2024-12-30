@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize filters
     initializeFilters();
     
+    // Load data from API
+    fetchData();
+
     // Add event listeners
     document.getElementById('decade-filter').addEventListener('change', applyFilters);
     document.getElementById('status-filter').addEventListener('change', applyFilters);
@@ -10,6 +13,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('min-files').addEventListener('input', applyFilters);
     document.getElementById('month-filter').addEventListener('change', applyFilters);
 });
+
+async function fetchData() {
+    try {
+        const response = await fetch('/api/data');
+        libraryData = await response.json();
+        applyFilters(); // Initial filter application
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
 
 function initializeFilters() {
     const currentYear = new Date().getFullYear();
