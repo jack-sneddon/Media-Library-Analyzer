@@ -1,116 +1,191 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize filters
-    initializeFilters();
-    
-    // Load data from API
-    fetchData();
+    console.log('Initializing Media Library Analyzer...');
 
-    // Add event listeners
-    document.getElementById('decade-filter').addEventListener('change', applyFilters);
-    document.getElementById('status-filter').addEventListener('change', applyFilters);
-    document.getElementById('year-start').addEventListener('input', applyFilters);
-    document.getElementById('year-end').addEventListener('input', applyFilters);
-    document.getElementById('min-files').addEventListener('input', applyFilters);
-    document.getElementById('month-filter').addEventListener('change', applyFilters);
-});
-
-async function fetchData() {
-    try {
-        const response = await fetch('/api/data');
-        libraryData = await response.json();
-        applyFilters(); // Initial filter application
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
-
-
-function initializeFilters() {
+    // Initialize filters first
     const currentYear = new Date().getFullYear();
     document.getElementById('year-end').max = currentYear;
     document.getElementById('year-start').max = currentYear;
-    updateActiveFilters();
+
+    // Add event listeners for all filter controls
+    const filterControls = [
+        'decade-filter',
+        'status-filter',
+        'month-filter',
+        'file-threshold',
+        'year-start',
+        'year-end'
+    ];
+
+    filterControls.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            const eventType = element.tagName === 'INPUT' ? 'input' : 'change';
+            element.addEventListener(eventType, () => {
+                console.log(`Filter changed: ${id}`);
+                applyFilters();
+            });
+        }
+    });
+
+    // Initial filter status
+    updateActiveFilters(getActiveFilters());
+    console.log('Initialization complete');
+});
+
+function getActiveFilters() {
+    console.log('Getting active filters...');
+    const filters = {
+        decade: document.getElementById('decade-filter')?.value || 'all',
+        status: document.getElementById('status-filter')?.value || 'all',
+        month: document.getElementById('month-filter')?.value || 'all',
+        fileThreshold: document.getElementById('file-threshold')?.value || 'all',
+        yearStart: null,
+        yearEnd: null
+    };
+
+    const yearStart = document.getElementById('year-start')?.value;
+    const yearEnd = document.getElementById('year-end')?.value;
+
+    if (yearStart) filters.yearStart = parseInt(yearStart);
+    if (yearEnd) filters.yearEnd = parseInt(yearEnd);
+
+    console.log('Current filters:', filters);
+    return filters;
 }
 
 function applyFilters() {
+    console.log('Applying filters...');
     const filters = getActiveFilters();
+    let totalVisible = 0;
+
     const years = document.querySelectorAll('.year');
-    
     years.forEach(year => {
         const yearNum = parseInt(year.getAttribute('data-year'));
-        const shouldShowYear = checkYearFilters(yearNum, filters);
-        
-        if (shouldShowYear) {
-            const months = year.querySelectorAll('.month-card');
-            let hasVisibleMonths = false;
-            
-            months.forEach(month => {
-                const shouldShowMonth = checkMonthFilters(month, filters);
-                month.classList.toggle('hidden', !shouldShowMonth);
-                if (shouldShowMonth) hasVisibleMonths = true;
-            });
-            
-            year.classList.toggle('hidden', !hasVisibleMonths);
-        } else {
-            year.classList.add('hidden');
-        }
-    });
-    
-    updateActiveFilters();
-}
+        let yearVisible = false;
 
-function getActiveFilters() {
-    return {
-        decade: document.getElementById('decade-filter').value,
-        status: document.getElementById('status-filter').value,
-        yearStart: parseInt(document.getElementById('year-start').value) || 1980,
-        yearEnd: parseInt(document.getElementById('year-end').value) || new Date().getFullYear(),
-        minFiles: parseInt(document.getElementById('min-files').value) || 0,
-        month: document.getElementById('month-filter').value
-    };
+        if (checkYearFilters(yearNum, filters)) {
+            const months = year.querySelectorAll('.month-card');
+            months.forEach(month => {
+                const monthVisible = checkMonthFilters(month, filters);
+                month.classList.toggle('hidden', !monthVisible);
+                if (monthVisible) {
+                    yearVisible = true;
+                    totalVisible++;
+                }
+            });
+        }
+
+        year.classList.toggle('hidden', !yearVisible);
+    });
+
+    console.log(`Filter application complete. ${totalVisible} items visible.`);
+    updateActiveFilters(filters);
 }
 
 function checkYearFilters(year, filters) {
-    const decade = Math.floor(year / 10) * 10;
-    return (filters.decade === 'all' || decade === parseInt(filters.decade)) &&
-           year >= filters.yearStart &&
-           year <= filters.yearEnd;
+    if (filters.decade !== 'all') {
+        const decade = Math.floor(year / 10) * 10;
+        if (decade !== parseInt(filters.decade)) {
+            return false;
+        }
+    }
+
+    if (filters.yearStart && year < filters.yearStart) return false;
+    if (filters.yearEnd && year > filters.yearEnd) return false;
+
+    return true;
 }
 
 function checkMonthFilters(monthCard, filters) {
     const status = monthCard.getAttribute('data-status');
     const fileCount = parseInt(monthCard.querySelector('.file-count').textContent.match(/\d+/)[0]);
-    const monthName = monthCard.querySelector('.month-name').textContent;
-    
-    return (filters.status === 'all' || status === filters.status) &&
-           fileCount >= filters.minFiles &&
-           (filters.month === 'all' || monthName.toLowerCase().includes(filters.month.toLowerCase()));
+    const monthName = monthCard.querySelector('.month-name').textContent.trim();
+
+    // Status check
+    if (filters.status !== 'all' && status !== filters.status) {
+        return false;
+    }
+
+    // Month check
+    if (filters.month !== 'all' && !monthName.toLowerCase().includes(filters.month.toLowerCase())) {
+        return false;
+    }
+
+    // Threshold check
+    if (filters.fileThreshold !== 'all') {
+        switch (filters.fileThreshold) {
+            case '0':
+                if (fileCount !== 0) return false;
+                break;
+            case '1-29':
+                if (fileCount < 1 || fileCount > 29) return false;
+                break;
+            case '30+':
+                if (fileCount < 30) return false;
+                break;
+        }
+    }
+
+    return true;
 }
 
-function resetFilters() {
-    document.getElementById('decade-filter').value = 'all';
-    document.getElementById('status-filter').value = 'all';
-    document.getElementById('year-start').value = '';
-    document.getElementById('year-end').value = '';
-    document.getElementById('min-files').value = '';
-    document.getElementById('month-filter').value = 'all';
+function applyPreset(presetName) {
+    console.log(`Applying preset: ${presetName}`);
+    const currentYear = new Date().getFullYear();
+
+    resetFilters(false);
+
+    switch(presetName) {
+        case 'recent-missing':
+            document.getElementById('year-start').value = currentYear - 1;
+            document.getElementById('year-end').value = currentYear;
+            document.getElementById('status-filter').value = 'missing';
+            break;
+        case 'all-missing':
+            document.getElementById('status-filter').value = 'missing';
+            break;
+        case 'incomplete':
+            document.getElementById('file-threshold').value = '1-29';
+            break;
+    }
+
     applyFilters();
 }
 
-function updateActiveFilters() {
-    const filters = getActiveFilters();
+function resetFilters(triggerUpdate = true) {
+    console.log('Resetting filters...');
+    
+    document.getElementById('decade-filter').value = 'all';
+    document.getElementById('status-filter').value = 'all';
+    document.getElementById('month-filter').value = 'all';
+    document.getElementById('file-threshold').value = 'all';
+    document.getElementById('year-start').value = '';
+    document.getElementById('year-end').value = '';
+
+    document.querySelectorAll('.year').forEach(year => year.classList.remove('hidden'));
+    document.querySelectorAll('.month-card').forEach(month => month.classList.remove('hidden'));
+
+    if (triggerUpdate) {
+        applyFilters();
+    }
+}
+
+function updateActiveFilters(filters) {
+    if (!filters) return;
+
     const activeFilters = [];
     
     if (filters.decade !== 'all') activeFilters.push(`Decade: ${filters.decade}s`);
     if (filters.status !== 'all') activeFilters.push(`Status: ${filters.status}`);
-    if (filters.minFiles > 0) activeFilters.push(`Min Files: ${filters.minFiles}`);
     if (filters.month !== 'all') activeFilters.push(`Month: ${filters.month}`);
-    if (filters.yearStart !== 1980 || filters.yearEnd !== new Date().getFullYear()) {
-        activeFilters.push(`Years: ${filters.yearStart}-${filters.yearEnd}`);
-    }
-    
+    if (filters.fileThreshold !== 'all') activeFilters.push(`Files: ${filters.fileThreshold}`);
+    if (filters.yearStart) activeFilters.push(`From: ${filters.yearStart}`);
+    if (filters.yearEnd) activeFilters.push(`To: ${filters.yearEnd}`);
+
     const filterDisplay = document.getElementById('active-filters');
-    filterDisplay.textContent = activeFilters.length > 0 
-        ? 'Active Filters: ' + activeFilters.join(' | ')
-        : 'No active filters';
+    if (filterDisplay) {
+        filterDisplay.textContent = activeFilters.length > 0 
+            ? 'Active Filters: ' + activeFilters.join(' | ')
+            : 'No active filters';
+    }
 }

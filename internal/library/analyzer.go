@@ -206,12 +206,12 @@ func (a *Analyzer) countFiles(path string) int {
 }
 
 func getStatus(count int) string {
-	switch {
-	case count == 0:
-		return "missing"
-	case count < 10:
-		return "light"
-	default:
-		return "normal"
-	}
+    switch {
+    case count == 0:
+        return "missing"
+    case count < 30:
+        return "light"
+    default:
+        return "normal"
+    }
 }

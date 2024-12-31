@@ -14,76 +14,98 @@
                 <p><strong>Last Updated:</strong> {{.LastUpdated.Format "2006-01-02 15:04:05"}}</p>
             </div>
             <div class="status-indicator">
-                <div class="indicator">
+                <div class="tooltip indicator">
                     <div class="dot normal"></div>
-                    <span>Normal (10+ files)</span>
+                    <span>Normal (30+ files)</span>
+                    <span class="tooltip-text">Good coverage: 30 or more files indicates adequate documentation for this month</span>
                 </div>
-                <div class="indicator">
+                <div class="tooltip indicator">
                     <div class="dot light"></div>
-                    <span>Light (1-9 files)</span>
+                    <span>Light (1-29 files)</span>
+                    <span class="tooltip-text">Light coverage: Consider adding more content to better document this month</span>
                 </div>
-                <div class="indicator">
+                <div class="tooltip indicator">
                     <div class="dot missing"></div>
                     <span>Missing (0 files)</span>
+                    <span class="tooltip-text">Missing content: No files found for this month - priority for content addition</span>
                 </div>
             </div>
         </div>
 
         <div class="filters">
-            <div class="filter-group">
-                <label for="decade-filter">Decade:</label>
-                <select id="decade-filter" class="filter-input">
-                    <option value="all">All Decades</option>
-                    <option value="2020">2020s</option>
-                    <option value="2010">2010s</option>
-                    <option value="2000">2000s</option>
-                    <option value="1990">1990s</option>
-                    <option value="1980">1980s</option>
-                </select>
+            <!-- Common filters -->
+            <div class="filter-section">
+                <h3>Quick Actions</h3>
+                <div class="preset-buttons">
+                    <button onclick="applyPreset('recent-missing')" class="filter-button">Show Missing (Last 2 Years)</button>
+                    <button onclick="applyPreset('all-missing')" class="filter-button">Show All Missing Years</button>
+                    <button onclick="applyPreset('incomplete')" class="filter-button">Show Light Months (1-29 files)</button>
+                    <button onclick="resetFilters()" class="filter-button filter-reset">Reset All</button>
+                </div>
             </div>
-            <div class="filter-group">
-                <label for="status-filter">Status:</label>
-                <select id="status-filter" class="filter-input">
-                    <option value="all">All Status</option>
-                    <option value="missing">Missing</option>
-                    <option value="light">Light</option>
-                    <option value="normal">Normal</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="month-filter">Month:</label>
-                <select id="month-filter" class="filter-input">
-                    <option value="all">All Months</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="min-files">Min Files:</label>
-                <input type="number" id="min-files" class="filter-input" min="0" placeholder="Min files">
-            </div>
-            <div class="filter-group">
-                <label>Year Range:</label>
-                <input type="number" id="year-start" class="filter-input" placeholder="Start Year" min="1980">
-                <span>to</span>
-                <input type="number" id="year-end" class="filter-input" placeholder="End Year">
-            </div>
-            <div class="filter-buttons">
-                <button onclick="resetFilters()" class="filter-button">Reset Filters</button>
+            <!-- Advanced filters -->
+            <div class="filter-section">
+                <h3>Advanced Filters</h3>
+                <div class="filter-groups">
+                    <div class="filter-group">
+                        <label for="decade-filter">Decade:</label>
+                        <select id="decade-filter" class="filter-input">
+                            <option value="all">All Decades</option>
+                            <option value="2020">2020s</option>
+                            <option value="2010">2010s</option>
+                            <option value="2000">2000s</option>
+                            <option value="1990">1990s</option>
+                            <option value="1980">1980s</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter">Status:</label>
+                        <select id="status-filter" class="filter-input">
+                            <option value="all">All Status</option>
+                            <option value="missing">Missing</option>
+                            <option value="light">Light</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="month-filter">Month:</label>
+                        <select id="month-filter" class="filter-input">
+                            <option value="all">All Months</option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="file-threshold">File Count:</label>
+                        <select id="file-threshold" class="filter-input">
+                            <option value="all">Any Count</option>
+                            <option value="0">Missing (0)</option>
+                            <option value="1-29">Light (1-29)</option>
+                            <option value="30+">Normal (30+)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Year Range:</label>
+                        <input type="number" id="year-start" class="filter-input" placeholder="Start Year" min="1980">
+                        <span>to</span>
+                        <input type="number" id="year-end" class="filter-input" placeholder="End Year">
+                    </div>
+                </div>
             </div>
             <div id="active-filters"></div>
         </div>
 
+        <!-- Years and Months Grid -->
         {{range .SortedYears}}
         <div class="year" data-year="{{.Year}}">
             <h2>
@@ -91,22 +113,31 @@
                 <span class="year-total">{{.Data.TotalFiles}} files</span>
             </h2>
             <div class="month-grid">
-                {{range $month := .Data.SortedMonths}}  <!-- Change to call method -->
-                <div class="month-card {{.Status}}" data-status="{{.Status}}">
+                {{range $month := .Data.SortedMonths}}
+                <div class="tooltip month-card {{.Status}}" data-status="{{.Status}}" data-file-count="{{.FileCount}}">
                     <div>
                         <h3 class="month-name">{{.Name}}</h3>
                         <p class="file-count">Files: {{.FileCount}}</p>
+                        {{if eq .Status "missing"}}
+                            <p class="status-text">❌ No files found</p>
+                        {{else if eq .Status "light"}}
+                            <p class="status-text">⚠️ Light content</p>
+                        {{end}}
                     </div>
-                    {{if eq .Status "missing"}}
-                        <p class="status-text">❌ No files found</p>
-                    {{else if eq .Status "light"}}
-                        <p class="status-text">⚠️ Low file count</p>
-                    {{end}}
+                    <span class="tooltip-text">
+                        {{if eq .Status "normal"}}
+                            Good coverage: {{.FileCount}} files for {{.Name}}
+                        {{else if eq .Status "light"}}
+                            Light coverage: Only {{.FileCount}} files for {{.Name}}. Consider adding more content.
+                        {{else}}
+                            Missing content: No files found for {{.Name}}. This month needs attention.
+                        {{end}}
+                    </span>
                 </div>
                 {{end}}
             </div>
         </div>
-    {{end}}
+        {{end}}
     </div>
 
     <script src="static/js/main.js"></script>
