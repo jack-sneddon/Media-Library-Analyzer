@@ -32,11 +32,11 @@ body {
   color: #2c3e50;
 }
 
+/* Visibility Controls */
 .hidden {
     display: none !important;
 }
 
-/* Filter section */
 /* Filter styles */
 .filters {
     background-color: white;
@@ -139,18 +139,22 @@ body {
 
 /* Month grid */
 .month-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
 }
 
 .month-card {
-  padding: 1.25rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    display: block;
+    padding: 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.year.hidden,
+.month-card.hidden {
+    display: none !important;
 }
 
 .month-card:hover {

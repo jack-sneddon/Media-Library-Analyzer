@@ -53,10 +53,25 @@ function getActiveFilters() {
     return filters;
 }
 
+function hideElement(element) {
+    element.classList.add('hidden');
+}
+
+function showElement(element) {
+    element.classList.remove('hidden');
+}
+
+function setElementVisibility(element, visible) {
+    if (visible) {
+        showElement(element);
+    } else {
+        hideElement(element);
+    }
+}
+
 function applyFilters() {
-    console.log('Applying filters...');
     const filters = getActiveFilters();
-    let totalVisible = 0;
+    let visibleCount = 0;
 
     const years = document.querySelectorAll('.year');
     years.forEach(year => {
@@ -67,19 +82,37 @@ function applyFilters() {
             const months = year.querySelectorAll('.month-card');
             months.forEach(month => {
                 const monthVisible = checkMonthFilters(month, filters);
-                month.classList.toggle('hidden', !monthVisible);
+                setElementVisibility(month, monthVisible);
                 if (monthVisible) {
                     yearVisible = true;
-                    totalVisible++;
+                    visibleCount++;
                 }
             });
         }
 
-        year.classList.toggle('hidden', !yearVisible);
+        setElementVisibility(year, yearVisible);
     });
 
-    console.log(`Filter application complete. ${totalVisible} items visible.`);
+    console.log(`Applied filters, ${visibleCount} items visible`);
     updateActiveFilters(filters);
+}
+
+function resetFilters(triggerUpdate = true) {
+    // Reset filter values
+    document.getElementById('decade-filter').value = 'all';
+    document.getElementById('status-filter').value = 'all';
+    document.getElementById('month-filter').value = 'all';
+    document.getElementById('file-threshold').value = 'all';
+    document.getElementById('year-start').value = '';
+    document.getElementById('year-end').value = '';
+
+    // Show all elements
+    document.querySelectorAll('.year').forEach(showElement);
+    document.querySelectorAll('.month-card').forEach(showElement);
+
+    if (triggerUpdate) {
+        applyFilters();
+    }
 }
 
 function checkYearFilters(year, filters) {
@@ -152,23 +185,6 @@ function applyPreset(presetName) {
     applyFilters();
 }
 
-function resetFilters(triggerUpdate = true) {
-    console.log('Resetting filters...');
-    
-    document.getElementById('decade-filter').value = 'all';
-    document.getElementById('status-filter').value = 'all';
-    document.getElementById('month-filter').value = 'all';
-    document.getElementById('file-threshold').value = 'all';
-    document.getElementById('year-start').value = '';
-    document.getElementById('year-end').value = '';
-
-    document.querySelectorAll('.year').forEach(year => year.classList.remove('hidden'));
-    document.querySelectorAll('.month-card').forEach(month => month.classList.remove('hidden'));
-
-    if (triggerUpdate) {
-        applyFilters();
-    }
-}
 
 function updateActiveFilters(filters) {
     if (!filters) return;

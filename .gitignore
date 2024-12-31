@@ -3,9 +3,8 @@ Media-Library-Analyzer
 
 # Generated files
 library_analysis.html
+media-analyzer
 
 # Mac system files
 .DS_Store
 
-# output
-library_analysis.html
