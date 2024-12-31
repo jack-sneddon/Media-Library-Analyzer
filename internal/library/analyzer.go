@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -14,7 +15,7 @@ import (
 type MonthData struct {
 	Name      string `json:"name"`
 	FileCount int    `json:"fileCount"`
-	Status    string `json:"status"` // "missing", "light", "normal"
+	Status    string `json:"status"` // "missing", "light", or "normal"
 }
 
 type YearData struct {
@@ -44,6 +45,21 @@ func (y *YearData) TotalFiles() int {
 		total += month.FileCount
 	}
 	return total
+}
+
+// SortedMonths returns a slice of MonthData sorted by chronological order
+func (y *YearData) SortedMonths() []*MonthData {
+	var months []*MonthData
+	for name, data := range y.Months {
+		data.Name = name
+		months = append(months, data)
+	}
+
+	sort.Slice(months, func(i, j int) bool {
+		return monthOrder(months[i].Name) < monthOrder(months[j].Name)
+	})
+
+	return months
 }
 
 func (a *Analyzer) extractYear(dirName string) (int, error) {
@@ -153,6 +169,26 @@ func (a *Analyzer) extractMonthName(dirName string) string {
 		return strings.TrimSpace(parts[1])
 	}
 	return ""
+}
+
+// monthOrder returns the numerical order (1-12) for a given month name
+// monthOrder returns the numerical order (1-12) for a given month name
+func monthOrder(month string) int {
+	monthOrders := map[string]int{
+		"January":   1,
+		"February":  2,
+		"March":     3,
+		"April":     4,
+		"May":       5,
+		"June":      6,
+		"July":      7,
+		"August":    8,
+		"September": 9,
+		"October":   10,
+		"November":  11,
+		"December":  12,
+	}
+	return monthOrders[month]
 }
 
 func (a *Analyzer) countFiles(path string) int {

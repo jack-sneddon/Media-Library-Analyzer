@@ -91,22 +91,22 @@
                 <span class="year-total">{{.Data.TotalFiles}} files</span>
             </h2>
             <div class="month-grid">
-                {{range $monthName, $monthData := .Data.Months}}
-                <div class="month-card {{$monthData.Status}}" data-status="{{$monthData.Status}}">
+                {{range $month := .Data.SortedMonths}}  <!-- Change to call method -->
+                <div class="month-card {{.Status}}" data-status="{{.Status}}">
                     <div>
-                        <h3 class="month-name">{{$monthName}}</h3>
-                        <p class="file-count">Files: {{$monthData.FileCount}}</p>
+                        <h3 class="month-name">{{.Name}}</h3>
+                        <p class="file-count">Files: {{.FileCount}}</p>
                     </div>
-                    {{if eq $monthData.Status "missing"}}
+                    {{if eq .Status "missing"}}
                         <p class="status-text">❌ No files found</p>
-                    {{else if eq $monthData.Status "light"}}
+                    {{else if eq .Status "light"}}
                         <p class="status-text">⚠️ Low file count</p>
                     {{end}}
                 </div>
                 {{end}}
             </div>
         </div>
-        {{end}}
+    {{end}}
     </div>
 
     <script src="static/js/main.js"></script>

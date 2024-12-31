@@ -158,7 +158,7 @@ func (r *Report) getPrioritizedIssues(currentYear int) ([]PriorityIssue, []Prior
 			if list[i].Year != list[j].Year {
 				return list[i].Year > list[j].Year // Recent years first
 			}
-			return list[i].Month < list[j].Month
+			return monthOrder(list[i].Month) < monthOrder(list[j].Month) // Sort by month order
 		})
 	}
 
